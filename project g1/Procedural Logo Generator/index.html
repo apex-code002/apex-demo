@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logo Generator Frontend</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Procedural Logo Control Panel</h1>
+        <p>Adjust the parameters below to generate different versions of the logo.</p>
+        
+        <div class="controls">
+            <label for="sides">1. Base Sides (SIDES): <span id="sidesValue">4</span></label>
+            <input type="range" id="sides" min="3" max="8" value="4" step="1" oninput="updateLogo()">
+
+            <label for="turns">2. Rotations (TURNS): <span id="turnsValue">12</span></label>
+            <input type="range" id="turns" min="5" max="30" value="12" step="1" oninput="updateLogo()">
+
+            <label for="scale">3. Spacing (SCALE): <span id="scaleValue">1.5</span></label>
+            <input type="range" id="scale" min="0.5" max="3.0" value="1.5" step="0.1" oninput="updateLogo()">
+        </div>
+
+        <div class="logo-display">
+            <h2>Current Logo Output</h2>
+            <img id="logoImage" src="final_logo.eps" alt="Generated Logo Preview">
+            <p class="note">Note: For a real application, clicking 'Generate' would send these values to the Python backend to create a new image.</p>
+        </div>
+    </div>
+    <script>
+        function updateLogo() {
+            // Get current values from sliders
+            const sides = document.getElementById('sides').value;
+            const turns = document.getElementById('turns').value;
+            const scale = document.getElementById('scale').value;
+
+            // Update the display numbers next to the sliders
+            document.getElementById('sidesValue').textContent = sides;
+            document.getElementById('turnsValue').textContent = turns;
+            document.getElementById('scaleValue').textContent = scale;
+
+            // --- SIMULATED LOGIC ---
+            // In a real application, this is where you would make an
+            // AJAX request to your Python server (the backend) like this:
+            // fetch('/generate-logo?sides=' + sides + '&turns=' + turns + '&scale=' + scale)
+            
+            // For this static demo, we just update the alt text to show the parameters
+            const imageElement = document.getElementById('logoImage');
+            imageElement.alt = `Logo generated with SIDES=${sides}, TURNS=${turns}, SCALE=${scale}`;
+        }
+        
+        // Run once on load to set initial values
+        window.onload = updateLogo;
+    </script>
+</body>
+</html>
