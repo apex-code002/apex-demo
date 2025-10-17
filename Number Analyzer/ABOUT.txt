@@ -1,0 +1,68 @@
+Project Name: Number Analyzer
+Purpose:
+
+The project is designed to analyze numbers entered by the user and tell whether each number is:
+
+Even or Odd
+
+Prime or Not prime
+
+Palindrome or Not palindrome
+
+This is a simple Python project suitable for beginners to practice functions, loops, conditionals, and user input.
+
+Key Features:
+
+User Input:
+
+The user can enter multiple numbers separated by spaces.
+
+The program handles invalid inputs gracefully.
+
+Analysis Functions:
+
+is_even(n): Checks if a number is divisible by 2.
+
+is_prime(n): Checks if a number is prime using an efficient method up to √n.
+
+is_palindrome(n): Checks if a number reads the same forwards and backwards.
+
+Output:
+
+For each number, the program prints whether it is even, prime, and a palindrome.
+
+Example output:
+
+Analyzing 121:
+Even: False
+Prime: False
+Palindrome: True
+
+
+Modular and Readable:
+
+Each check is in a separate function.
+
+Easy to extend with more features, e.g., factorial, odd/even sum, etc.
+
+Learning Objectives:
+
+Using Python functions for code modularity.
+
+Using loops to process multiple numbers.
+
+Applying conditional logic to check number properties.
+
+Handling user input and simple input validation.
+
+Understanding string manipulation for palindrome checking.
+
+Possible Extensions (Optional Enhancements):
+
+Allow the user to choose which property to check.
+
+Highlight results using colors in the terminal.
+
+Save the results to a text file.
+
+Add GUI interface with Tkinter for a visual tool.
