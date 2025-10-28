@@ -3,421 +3,275 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Deep Ocean Password Generator</title>
+<title>DeepOcean Security – Professional Password Generator</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-    /* Color Palette */
-    :root {
-        --color-primary: #0077b6; /* Deep Teal/Blue */
-        --color-secondary: #00b4d8; /* Bright Sky Blue */
-        --color-text: #111;
-        --color-light-bg: #e0f2f7; /* Very Light Blue */
-        --color-card-bg: #fff;
-        --color-gradient-start: #023e8a; /* Deep Ocean */
-        --color-gradient-end: #0077b6;
-        --shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-    }
-
-    * {
-        box-sizing: border-box;
-    }
-    body {
-        font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        color: var(--color-text);
-    }
-    .container {
-        background: var(--color-card-bg);
-        padding: 40px;
-        border-radius: 25px;
-        box-shadow: var(--shadow);
-        width: 450px;
-        max-width: 90%;
-        text-align: center;
-        transition: transform 0.3s ease-in-out;
-    }
-    .container:hover {
-        transform: translateY(-5px);
-    }
-    
-    h1 {
-        margin-bottom: 30px;
-        color: var(--color-primary);
-        font-size: 2em;
-        font-weight: 700;
-        border-bottom: 2px solid var(--color-secondary);
-        padding-bottom: 10px;
-    }
-    
-    /* Input Group Styling */
-    .input-group {
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-weight: 600;
-    }
-    input[type=number] {
-        width: 90px;
-        padding: 10px 5px;
-        border-radius: 10px;
-        border: 2px solid var(--color-secondary);
-        text-align: center;
-        font-size: 1.1em;
-        font-weight: 600;
-        transition: border-color 0.3s;
-    }
-    input[type=number]:focus {
-        border-color: var(--color-primary);
-        outline: none;
-    }
-
-    /* Options (Checkboxes) Styling */
-    .options {
-        text-align: left;
-        font-size: 1em;
-        margin-bottom: 25px;
-        padding-top: 15px;
-        border-top: 1px solid var(--color-light-bg);
-    }
-    .options label {
-        display: flex;
-        align-items: center;
-        margin: 10px 0;
-        cursor: pointer;
-        transition: color 0.2s;
-        font-weight: 500;
-    }
-    .options label:hover {
-        color: var(--color-primary);
-    }
-    .options input[type="checkbox"] {
-        /* Custom checkbox style */
-        appearance: none;
-        width: 20px;
-        height: 20px;
-        border: 2px solid var(--color-secondary);
-        border-radius: 5px;
-        margin-right: 15px;
-        position: relative;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    .options input[type="checkbox"]:checked {
-        background-color: var(--color-primary);
-        border-color: var(--color-primary);
-    }
-    .options input[type="checkbox"]:checked::after {
-        content: '✓';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: white;
-        font-size: 14px;
-    }
-
-    /* Button Styling */
-    .buttons-container {
-        display: flex;
-        gap: 15px;
-        margin-bottom: 20px;
-    }
-    button {
-        padding: 12px 25px;
-        border: none;
-        font-size: 1em;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: background 0.3s, transform 0.1s;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-    #generateBtn {
-        background: var(--color-primary);
-        color: white;
-    }
-    #generateBtn:hover {
-        background: #005f96;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-    }
-    #copyBtn {
-        background: var(--color-secondary);
-        color: var(--color-text);
-    }
-    #copyBtn:hover {
-        background: #0099b6;
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-    }
-    
-    /* Password Display Styling */
-    #password-display {
-        font-family: 'Courier New', monospace;
-        word-break: break-all;
-        font-weight: 700;
-        font-size: 1.2em;
-        color: var(--color-primary);
-        background: var(--color-light-bg);
-        padding: 18px;
-        border-radius: 10px;
-        min-height: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid var(--color-secondary);
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-    }
-    
-    #copyMsg {
-        color: #28a745; /* Green for success */
-        font-size: 0.9em;
-        margin-top: 10px;
-        display: none;
-        font-weight: 600;
-    }
-    
-    /* Strength Meter Styling */
-    .strength-bar {
-        width: 100%;
-        height: 14px;
-        border-radius: 7px;
-        background: var(--color-light-bg);
-        margin-top: 20px;
-        overflow: hidden;
-        border: 1px solid #ddd;
-    }
-    .strength-bar div {
-        height: 100%;
-        width: 0%;
-        transition: width 0.4s ease-out, background-color 0.4s ease-out;
-    }
-    #strengthText {
-        margin-top: 8px;
-        font-weight: 600;
-        font-size: 0.9em;
-        color: var(--color-primary);
-    }
-    .error-msg {
-        color: #dc3545; /* Red for error */
-        font-size: 0.8em;
-        margin-top: 5px;
-        font-weight: 500;
-    }
+:root {
+    --primary: #00b4d8;
+    --secondary: #0077b6;
+    --accent: #90e0ef;
+    --text: #e9ecef;
+    --card-bg: rgba(255,255,255,0.12);
+    --border: rgba(255,255,255,0.2);
+    --shadow: 0 8px 32px rgba(0,0,0,0.35);
+}
+* {
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: radial-gradient(circle at top left, #03045e, #000814 80%);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+}
+.header {
+    text-align: center;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+}
+.header h2 {
+    margin: 0;
+    color: var(--accent);
+    font-weight: 700;
+}
+.container {
+    background: var(--card-bg);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--border);
+    padding: 40px 45px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    width: 420px;
+    max-width: 90%;
+    text-align: center;
+    animation: fadeIn 1s ease;
+}
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+h1 {
+    font-size: 1.8em;
+    color: var(--accent);
+    margin-bottom: 15px;
+}
+.input-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 15px 0;
+}
+input[type=number] {
+    width: 80px;
+    padding: 8px;
+    font-size: 1em;
+    border-radius: 8px;
+    border: none;
+    text-align: center;
+    background: rgba(255,255,255,0.1);
+    color: var(--text);
+    outline: none;
+}
+input[type=number]:focus {
+    box-shadow: 0 0 6px var(--accent);
+}
+.options {
+    text-align: left;
+    margin: 15px 0 25px;
+    font-size: 0.95em;
+}
+.options label {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    cursor: pointer;
+}
+.options input {
+    margin-right: 10px;
+    transform: scale(1.2);
+    accent-color: var(--accent);
+}
+button {
+    padding: 10px 22px;
+    font-size: 1em;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    margin: 5px;
+    cursor: pointer;
+    color: #fff;
+    transition: 0.3s;
+}
+#generateBtn {
+    background: var(--primary);
+}
+#generateBtn:hover {
+    background: var(--secondary);
+    transform: translateY(-2px);
+}
+#copyBtn {
+    background: #48cae4;
+    color: #001219;
+}
+#copyBtn:hover {
+    background: #00b4d8;
+}
+#password-display {
+    background: rgba(0,0,0,0.25);
+    padding: 15px;
+    border-radius: 10px;
+    font-family: monospace;
+    font-weight: 600;
+    font-size: 1.1em;
+    margin-top: 15px;
+    border: 1px solid var(--border);
+    word-wrap: break-word;
+    color: var(--accent);
+}
+#copyMsg {
+    display: none;
+    color: #80ed99;
+    font-weight: 500;
+    margin-top: 8px;
+}
+.strength-bar {
+    width: 100%;
+    height: 10px;
+    border-radius: 5px;
+    background: rgba(255,255,255,0.1);
+    overflow: hidden;
+    margin-top: 20px;
+}
+.strength-bar div {
+    height: 100%;
+    width: 0%;
+    transition: width 0.4s ease-out, background 0.4s;
+}
+#strengthText {
+    margin-top: 8px;
+    font-size: 0.9em;
+    font-weight: 600;
+}
+.counter {
+    font-size: 0.8em;
+    opacity: 0.8;
+}
+@media (max-width: 480px) {
+    .container { padding: 30px; }
+}
 </style>
 </head>
 <body>
+<div class="header">
+    <h2>🌊 DeepOcean Security Tools</h2>
+</div>
+
 <div class="container">
-    <h1>🔑 Password Generator</h1>
+    <h1>Professional Password Generator</h1>
 
     <div class="input-group">
-        <label for="length"><b>Password Length:</b></label>
+        <label><b>Password Length:</b></label>
         <input type="number" id="length" value="16" min="6" max="128">
     </div>
-    <div id="lengthError" class="error-msg" style="text-align: right;" aria-live="polite">Minimum length is 6.</div>
+    <div class="counter" id="charCount">Characters: 16</div>
 
     <div class="options">
         <label><input type="checkbox" id="includeUpper" checked> Include Uppercase (A–Z)</label>
         <label><input type="checkbox" id="includeNumbers" checked> Include Numbers (0–9)</label>
         <label><input type="checkbox" id="includeSymbols" checked> Include Symbols (!@#...)</label>
     </div>
-    <div id="optionsError" class="error-msg" aria-live="polite">You must select at least one character type.</div>
 
-    <div class="buttons-container">
-        <button id="generateBtn" onclick="app.generatePassword()">Generate Password</button>
-        <button id="copyBtn" onclick="app.copyPassword()">📋 Copy</button>
-    </div>
+    <button id="generateBtn" onclick="app.generatePassword()">Generate</button>
+    <button id="copyBtn" onclick="app.copyPassword()">📋 Copy</button>
 
-    <div id="password-display" role="status" aria-live="assertive">Click 'Generate Password'</div>
-    <div id="copyMsg" aria-live="polite">✅ Password copied to clipboard!</div>
+    <div id="password-display">Click "Generate" to create your password</div>
+    <div id="copyMsg">✅ Copied to clipboard!</div>
 
     <div class="strength-bar"><div id="strengthFill"></div></div>
     <div id="strengthText">Strength: N/A</div>
 </div>
 
 <script>
-// --- START of Advanced JavaScript Class (Kept from previous iteration) ---
-class PasswordGeneratorApp {
+class PasswordGenerator {
     constructor() {
-        this.CHAR_SETS = {
+        this.sets = {
             lower: "abcdefghijklmnopqrstuvwxyz",
             upper: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-            numbers: "0123456789",
-            symbols: "!@#$%^&*()-_=+[]{}|;:,.<>/?`~"
+            num: "0123456789",
+            sym: "!@#$%^&*()-_=+[]{}|;:,.<>/?`~"
         };
         this.dom = {
-            lengthInput: document.getElementById('length'),
-            upperCheckbox: document.getElementById('includeUpper'),
-            numbersCheckbox: document.getElementById('includeNumbers'),
-            symbolsCheckbox: document.getElementById('includeSymbols'),
-            passwordDisplay: document.getElementById('password-display'),
-            copyMsg: document.getElementById('copyMsg'),
-            strengthFill: document.getElementById('strengthFill'),
-            strengthText: document.getElementById('strengthText'),
-            lengthError: document.getElementById('lengthError'),
-            optionsError: document.getElementById('optionsError'),
+            len: document.getElementById('length'),
+            upper: document.getElementById('includeUpper'),
+            num: document.getElementById('includeNumbers'),
+            sym: document.getElementById('includeSymbols'),
+            disp: document.getElementById('password-display'),
+            copy: document.getElementById('copyMsg'),
+            bar: document.getElementById('strengthFill'),
+            text: document.getElementById('strengthText'),
+            count: document.getElementById('charCount')
         };
-        this.initEventListeners();
-        this.validateLength();
-        this.updateStrength("");
-    }
-    initEventListeners() {
-        this.dom.lengthInput.addEventListener('input', () => {
-            this.validateLength();
-            this.updateStrength(this.dom.passwordDisplay.innerText);
-        });
-        [this.dom.upperCheckbox, this.dom.numbersCheckbox, this.dom.symbolsCheckbox].forEach(cb => {
-            cb.addEventListener('change', () => {
-                this.validateOptions();
-                this.updateStrength(this.dom.passwordDisplay.innerText);
-            });
+        this.dom.len.addEventListener('input', () => {
+            this.dom.count.textContent = "Characters: " + this.dom.len.value;
         });
     }
-    validateLength() {
-        let length = parseInt(this.dom.lengthInput.value);
-        const minLength = parseInt(this.dom.lengthInput.min);
-        const maxLength = parseInt(this.dom.lengthInput.max);
-        
-        if (isNaN(length) || length < minLength) {
-            this.dom.lengthInput.value = minLength;
-            this.dom.lengthError.innerText = `Minimum length is ${minLength}.`;
-            this.dom.lengthError.style.display = 'block';
-        } else if (length > maxLength) {
-            this.dom.lengthInput.value = maxLength;
-            this.dom.lengthError.innerText = `Maximum length is ${maxLength}.`;
-            this.dom.lengthError.style.display = 'block';
-        } else {
-            this.dom.lengthError.style.display = 'none';
-        }
+    randomChar(set) {
+        return set[Math.floor(Math.random() * set.length)];
     }
-    validateOptions() {
-        const includeUpper = this.dom.upperCheckbox.checked;
-        const includeNumbers = this.dom.numbersCheckbox.checked;
-        const includeSymbols = this.dom.symbolsCheckbox.checked;
-        if (!(true || includeUpper || includeNumbers || includeSymbols)) {
-            this.dom.optionsError.style.display = 'block';
-            return false;
-        } else {
-            this.dom.optionsError.style.display = 'none';
-            return true;
-        }
-    }
-    generatePassword() {
-        this.validateLength();
-        if (!this.validateOptions()) {
-            this.dom.passwordDisplay.innerText = "Select character types!";
-            this.updateStrength("");
-            return;
-        }
-        const length = parseInt(this.dom.lengthInput.value);
-        const includeUpper = this.dom.upperCheckbox.checked;
-        const includeNumbers = this.dom.numbersCheckbox.checked;
-        const includeSymbols = this.dom.symbolsCheckbox.checked;
-        let allChars = this.CHAR_SETS.lower;
-        const requiredChars = [];
-        requiredChars.push(this.getRandomChar(this.CHAR_SETS.lower));
-        if (includeUpper) {
-            allChars += this.CHAR_SETS.upper;
-            requiredChars.push(this.getRandomChar(this.CHAR_SETS.upper));
-        }
-        if (includeNumbers) {
-            allChars += this.CHAR_SETS.numbers;
-            requiredChars.push(this.getRandomChar(this.CHAR_SETS.numbers));
-        }
-        if (includeSymbols) {
-            allChars += this.CHAR_SETS.symbols;
-            requiredChars.push(this.getRandomChar(this.CHAR_SETS.symbols));
-        }
-        if (requiredChars.length > length) {
-            this.dom.passwordDisplay.innerText = `Error: Length (${length}) is too short for selected options.`;
-            this.updateStrength("");
-            return;
-        }
-        let password = requiredChars.join('');
-        const remainingLength = length - password.length;
-        for (let i = 0; i < remainingLength; i++) {
-            password += this.getRandomChar(allChars);
-        }
-        password = this.shuffleString(password);
-        this.dom.passwordDisplay.innerText = password;
-        this.dom.copyMsg.style.display = 'none';
-        this.updateStrength(password);
-    }
-    getRandomChar(charSet) {
-        return charSet.charAt(Math.floor(Math.random() * charSet.length));
-    }
-    shuffleString(str) {
+    shuffle(str) {
         return str.split('').sort(() => Math.random() - 0.5).join('');
     }
+    generatePassword() {
+        let len = parseInt(this.dom.len.value);
+        let chars = this.sets.lower;
+        let must = [this.randomChar(this.sets.lower)];
+        if (this.dom.upper.checked) { chars += this.sets.upper; must.push(this.randomChar(this.sets.upper)); }
+        if (this.dom.num.checked) { chars += this.sets.num; must.push(this.randomChar(this.sets.num)); }
+        if (this.dom.sym.checked) { chars += this.sets.sym; must.push(this.randomChar(this.sets.sym)); }
+
+        let pass = must.join('');
+        for (let i = pass.length; i < len; i++) {
+            pass += this.randomChar(chars);
+        }
+        pass = this.shuffle(pass);
+        this.dom.disp.textContent = pass;
+        this.dom.copy.style.display = 'none';
+        this.strengthMeter(pass);
+    }
     copyPassword() {
-        const password = this.dom.passwordDisplay.innerText;
-        if (password && !password.includes('Click') && !password.includes('Error') && !password.includes('Select')) {
-            navigator.clipboard.writeText(password).then(() => {
-                this.dom.copyMsg.style.display = 'block';
-                setTimeout(() => this.dom.copyMsg.style.display = 'none', 1500);
-            }).catch(err => {
-                console.error('Copy failed:', err);
-            });
+        let pass = this.dom.disp.textContent;
+        if (pass && !pass.includes("Click")) {
+            navigator.clipboard.writeText(pass);
+            this.dom.copy.style.display = 'block';
+            setTimeout(() => this.dom.copy.style.display = 'none', 1500);
         }
     }
-    updateStrength(password) {
-        const length = password.length;
+    strengthMeter(pass) {
         let score = 0;
-        
-        if (password.match(/[a-z]/)) score++;
-        if (password.match(/[A-Z]/)) score++;
-        if (password.match(/[0-9]/)) score++;
-        if (password.match(/[!@#$%^&*()-_=+\[\]{}|;:,.<>/?`~]/)) score++; 
-
-        let lengthScore = 0;
-        if (length >= 10) lengthScore = 1;
-        if (length >= 16) lengthScore = 2;
-
-        let totalStrength = score + lengthScore;
-        
-        let width = (totalStrength / 6) * 100;
-        let color = "var(--color-light-bg)";
-        let text = "N/A";
-        
-        // Use a vibrant scale for professional look
-        if (totalStrength <= 2) {
-            color = "#dc3545"; // Red
-            text = "Too Weak";
-        } else if (totalStrength === 3) {
-            color = "#ffc107"; // Yellow
-            text = "Weak";
-        } else if (totalStrength === 4) {
-            color = "#20c997"; // Mint Green
-            text = "Medium";
-        } else if (totalStrength === 5) {
-            color = "#00bcd4"; // Cyan
-            text = "Strong";
-        } else if (totalStrength >= 6) {
-            color = "#28a745"; // Success Green
-            text = "Excellent";
-        }
-
-        if (!password || password.includes('Click') || password.includes('Error') || password.includes('Select')) {
-            width = 0;
-            color = "var(--color-light-bg)";
-            text = "N/A";
-        } 
-        
-        this.dom.strengthFill.style.width = width + "%";
-        this.dom.strengthFill.style.background = color;
-        this.dom.strengthText.innerText = "Strength: " + text;
+        if (/[a-z]/.test(pass)) score++;
+        if (/[A-Z]/.test(pass)) score++;
+        if (/[0-9]/.test(pass)) score++;
+        if (/[!@#$%^&*(),.?":{}|<>]/.test(pass)) score++;
+        if (pass.length >= 12) score++;
+        let pct = (score / 5) * 100;
+        let color = "#f00";
+        let text = "Weak 🔴";
+        if (score >= 4) { color = "#4caf50"; text = "Strong 🟢"; }
+        else if (score === 3) { color = "#ff9800"; text = "Medium 🟡"; }
+        this.dom.bar.style.width = pct + "%";
+        this.dom.bar.style.background = color;
+        this.dom.text.textContent = "Strength: " + text;
+        if (score >= 4) document.body.style.boxShadow = "0 0 40px rgba(0,255,200,0.25)";
+        else document.body.style.boxShadow = "none";
     }
 }
-const app = new PasswordGeneratorApp();
-// --- END of Advanced JavaScript Class ---
+const app = new PasswordGenerator();
 </script>
 </body>
 </html>
