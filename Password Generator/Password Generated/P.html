@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Professional Password Generator</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(to right, #667eea, #764ba2);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .container {
+        background: white;
+        padding: 30px 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        text-align: center;
+        width: 400px;
+    }
+    h1 {
+        margin-bottom: 20px;
+        color: #333;
+    }
+    input[type=number] {
+        width: 60px;
+        padding: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    button {
+        padding: 10px 20px;
+        border: none;
+        background: #667eea;
+        color: white;
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+        margin: 5px;
+    }
+    button:hover {
+        background: #764ba2;
+    }
+    #password {
+        margin-top: 20px;
+        font-family: monospace;
+        word-break: break-all;
+        font-weight: bold;
+        color: #333;
+    }
+    #strength {
+        margin-top: 10px;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Password Generator</h1>
+    <label for="length">Password Length:</label>
+    <input type="number" id="length" value="12" min="6" max="50">
+    <br>
+    <button onclick="generatePassword()">Generate Password</button>
+    <button onclick="copyPassword()">Copy</button>
+    <div id="password"></div>
+    <div id="strength"></div>
+</div>
+
+<script>
+function generatePassword() {
+    const length = parseInt(document.getElementById('length').value);
+    const letters = "abcdefghijklmnopqrstuvwxyz";
+    const upper = letters.toUpperCase();
+    const numbers = "0123456789";
+    const symbols = "!@#$%^&*()-_=+[]{}|;:,.<>?";
+    const allChars = letters + upper + numbers + symbols;
+
+    let password = '';
+    // Ensure at least one lowercase, one uppercase, one number, and one symbol
+    password += letters[Math.floor(Math.random() * letters.length)];
+    password += upper[Math.floor(Math.random() * upper.length)];
+    password += numbers[Math.floor(Math.random() * numbers.length)];
+    password += symbols[Math.floor(Math.random() * symbols.length)];
+
+    for (let i = password.length; i < length; i++) {
+        password += allChars.charAt(Math.floor(Math.random() * allChars.length));
+    }
+
+    // Shuffle password to avoid predictable pattern
+    password = password.split('').sort(() => Math.random() - 0.5).join('');
+
+    document.getElementById('password').innerText = password;
+    checkStrength(password);
+}
+
+function copyPassword() {
+    const password = document.getElementById('password').innerText;
+    if (password) {
+        navigator.clipboard.writeText(password);
+        alert("Password copied to clipboard!");
+    }
+}
+
+function checkStrength(password) {
+    let strength = "Weak";
+    const strongRegex = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/;
+    if (password.length >= 12 && strongRegex.test(password)) strength = "Strong";
+    else if (password.length >= 8) strength = "Medium";
+    document.getElementById('strength').innerText = "Strength: " + strength;
+}
+</script>
+</body>
+</html>
