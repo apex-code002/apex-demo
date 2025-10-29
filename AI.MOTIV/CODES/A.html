@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>DeepOcean Tools — Pro Suite (Enhanced)</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-light: linear-gradient(180deg,#e6f7ff 0%,#f6fbff 100%);
+    --bg-dark: linear-gradient(180deg,#071426 0%,#012033 100%);
+    --card: rgba(255,255,255,0.03);
+    --muted: #9fb6c6;
+    --accent: #38d6ff;
+    --accent-2:#7ae7ff;
+    --good: #7ef59b;
+    --danger: #ff8a8a;
+    --text-light: #012;
+    --text-dark: #eaf6fb;
+    --glass: rgba(255,255,255,0.04);
+    --max-width:1120px;
+    --radius:12px;
+  }
+  html,body{height:100%;margin:0}
+  body{
+    background: var(--bg-dark);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    color:var(--text-dark);
+    transition: background 0.45s ease, color 0.3s ease;
+    font-family: 'Poppins', system-ui, Arial;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+  body.light{ background:var(--bg-light); color:var(--text-light); }
+
+  .app{ width:var(--max-width); max-width:100%; display:grid; grid-template-columns: 1fr 420px; gap:20px; align-items:start; position:relative; }
+  .card{ position:relative; z-index:1; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:var(--radius); padding:16px; box-shadow: 0 10px 40px rgba(2,8,22,0.6); backdrop-filter: blur(8px); border:1px solid rgba(255,255,255,0.04); overflow:hidden; }
+  .brandRow{ grid-column:1/-1; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+  .logo{ width:56px;height:56px;border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); display:flex;align-items:center;justify-content:center; font-weight:800;color:#012; box-shadow:0 6px 20px rgba(56,214,255,0.12); }
+  h1{margin:0;font-size:20px}
+  p.lead{margin:0;color:var(--muted);font-size:13px}
+  .controls{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .seg{ background:rgba(255,255,255,0.02); padding:8px; border-radius:10px; border:1px solid rgba(255,255,255,0.03); display:flex; gap:8px; align-items:center; }
+  .btn{ padding:9px 14px; border-radius:10px; border:none; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#012; font-weight:700; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,0.35); }
+  .btn.secondary{ background:transparent; border:1px solid rgba(255,255,255,0.06); color:var(--accent-2); font-weight:600; }
+  .small{ padding:7px 10px; font-size:13px; border-radius:8px; background:transparent; border:1px solid rgba(255,255,255,0.03); color:inherit; cursor:pointer; }
+  input[type="text"], input[type="number"], textarea, select{ background:transparent; border:1px solid rgba(255,255,255,0.04); padding:8px; border-radius:8px; color:inherit; outline:none; font-size:14px; }
+
+  .display{ min-height:140px; border-radius:12px; padding:18px; background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.03); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+  .quote-text{ font-size:18px; line-height:1.35; text-align:center; padding:6px 10px; color:inherit; font-weight:600; }
+  .quote-author{ margin-top:10px; font-size:13px; color:var(--muted); text-align:center; }
+  .favorites{ max-height:320px; overflow:auto; padding:8px; border-radius:8px; background:rgba(255,255,255,0.015); border:1px dashed rgba(255,255,255,0.02); }
+  .fav-item{ padding:10px; border-radius:10px; margin-bottom:8px; background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); display:flex; justify-content:space-between; gap:8px; align-items:center; font-size:14px; }
+  .name-results{ display:grid; grid-template-columns:repeat(2,1fr); gap:8px; max-height:360px; overflow:auto; padding:6px; background:rgba(255,255,255,0.01); border-radius:8px; }
+  .name-card{ padding:10px; border-radius:8px; background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02)); display:flex; align-items:center; justify-content:space-between; gap:8px; font-weight:700; font-size:14px; }
+  .mini{ font-size:13px; color:var(--muted); }
+  footer.smallprint{ grid-column:1/-1; margin-top:6px; color:var(--muted); font-size:13px; text-align:center; }
+
+  .searchFav{ width:100%; padding:8px; margin-bottom:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.03); }
+
+  @media (max-width:980px){ .app{ grid-template-columns:1fr; } .right{ order:2 } .name-results{ grid-template-columns:repeat(1,1fr);} }
+</style>
+</head>
+<body>
+  <canvas id="particleLayer" aria-hidden="true"></canvas>
+  <div class="app" role="application" aria-label="DeepOcean Tools Pro">
+    <div class="brandRow">
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="logo" aria-hidden>DO</div>
+        <div>
+          <h1>DeepOcean Tools</h1>
+          <p class="lead">Pro suite — Quotes, Name Creator, Utilities</p>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="btn small" id="btnTheme" aria-pressed="false">Toggle Theme</button>
+        <button class="btn small" id="exportAll">Export All</button>
+        <button class="btn secondary small" id="importFav">Import</button>
+      </div>
+    </div>
+
+    <!-- LEFT -->
+    <div class="card left" aria-live="polite">
+      <section>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div>
+            <strong style="font-size:16px">Motivation & Insights</strong>
+            <div class="mini">Smart quotes • tag filter • auto-rotate • notifications</div>
+          </div>
+
+          <div class="controls" role="toolbar" aria-label="Quote controls">
+            <label class="seg">
+              <span class="mini">Category</span>
+              <select id="quoteCategory" style="margin-left:8px">
+                <option value="focus">Focus</option>
+                <option value="confidence">Confidence</option>
+                <option value="creativity">Creativity</option>
+                <option value="calm">Calm</option>
+                <option value="all">All</option>
+              </select>
+            </label>
+
+            <label class="seg"><input type="checkbox" id="autoRotate" /><span class="mini">Auto</span></label>
+            <label class="seg"><input type="checkbox" id="showConfetti" /><span class="mini">Confetti</span></label>
+            <label class="seg"><input type="checkbox" id="enableSound" checked /><span class="mini">Sound</span></label>
+          </div>
+        </div>
+
+        <div class="display" id="quoteDisplay" aria-live="assertive">
+          <div>
+            <div class="quote-text" id="quoteText">Tap <strong>Generate</strong> to get inspired ✨</div>
+            <div class="quote-author" id="quoteAuthor"></div>
+          </div>
+          <canvas id="confettiCanvas" style="position:absolute;inset:0;pointer-events:none" aria-hidden></canvas>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+          <div style="display:flex;gap:8px">
+            <button class="btn" id="genQuote">Generate</button>
+            <button class="btn secondary" id="favQuote">♡ Favorite</button>
+            <button class="btn secondary" id="copyQuote">Copy</button>
+          </div>
+
+          <div style="display:flex;gap:8px;align-items:center">
+            <label class="mini">Speed
+              <input type="number" id="rotateInterval" value="6000" min="1500" max="30000" style="width:90px;margin-left:8px">
+            </label>
+
+            <label class="mini">Notify
+              <input type="checkbox" id="notifyToggle" title="Request permission to show hourly quotes" style="margin-left:6px">
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <hr style="border:none;height:1px;background:rgba(255,255,255,0.03);margin:18px 0" />
+
+      <!-- Name Creator -->
+      <section>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div>
+            <strong style="font-size:16px">Name & Idea Creator</strong>
+            <div class="mini">Batch names • styles • keyword bias • exports</div>
+          </div>
+
+          <div style="display:flex;gap:8px">
+            <select id="nameType" class="small" title="Purpose">
+              <option value="brand">Brand</option>
+              <option value="game">Game</option>
+              <option value="yt">YouTube</option>
+              <option value="username">Username</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="controls" style="margin-bottom:8px">
+          <div class="seg" style="flex:1">
+            <label class="mini" style="margin-right:8px">Keywords</label>
+            <input id="keywords" type="text" placeholder="e.g., ocean, flow, deep" aria-label="Keywords for name generator" />
+          </div>
+
+          <div class="seg">
+            <label class="mini" style="margin-right:8px">Style</label>
+            <select id="nameStyle">
+              <option value="modern">Modern</option>
+              <option value="futuristic">Futuristic</option>
+              <option value="cute">Cute</option>
+              <option value="edgy">Edgy</option>
+            </select>
+          </div>
+
+          <div class="seg">
+            <label class="mini" style="margin-right:8px">Count</label>
+            <input id="nameCount" type="number" value="12" min="3" max="100" style="width:76px" />
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <button class="btn" id="genNames">Generate Names</button>
+          <button class="btn secondary" id="favSelection">Favorite All</button>
+          <button class="btn secondary" id="copyAllNames">Copy All</button>
+          <button class="btn secondary" id="exportNames">Export (CSV)</button>
+        </div>
+
+        <div class="name-results" id="nameResults" aria-live="polite"></div>
+      </section>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="card right" style="min-width:300px;">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <strong>Favorites & Utilities</strong>
+          <div class="mini">Saved quotes & names (local)</div>
+        </div>
+        <div style="width:36%">
+          <input id="searchFav" class="searchFav" placeholder="Search favorites..." aria-label="Search favorites">
+        </div>
+      </div>
+
+      <div class="favorites" id="favoritesList" aria-live="polite"></div>
+
+      <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+        <button class="btn" id="exportFav">Export (.txt)</button>
+        <button class="btn secondary" id="clearFav">Clear Favorites</button>
+      </div>
+
+      <hr style="border:none;height:1px;background:rgba(255,255,255,0.03);margin:12px 0" />
+
+      <div>
+        <strong>Usage Stats</strong>
+        <div class="mini" id="statsArea" style="margin-top:8px">
+          Generated: <span id="statGenerated">0</span> • Favorites: <span id="statFavs">0</span><br>
+          Names generated: <span id="statNames">0</span>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <strong>Quick Tips</strong>
+        <ul class="mini" style="padding-left:18px;margin:8px 0 0 0">
+          <li>Use keywords to bias name results.</li>
+          <li>Try different styles for new combos.</li>
+          <li>Export favorites for backup or portfolio use.</li>
+        </ul>
+      </div>
+
+      <div style="margin-top:14px;color:var(--muted);font-size:13px">Built with ✨ by DeepOcean Labs</div>
+    </div>
+
+    <footer class="smallprint">Tip: press Enter in Keywords to generate. Notifications require permission.</footer>
+  </div>
+
+<script>
+/* -----------------------------------------------------------------
+   Enhanced DeepOcean: cleaner structure, accessibility, favorites search,
+   import/export JSON, improved randomness & duplicate handling.
+   -----------------------------------------------------------------*/
+
+// small word lists (kept local for privacy + fast offline)
+const NAME_WORDS = {
+  modern: ["neo","luma","flux","byte","scope","pulse","core","loop","drift","nexus","vector","spark","aero","atlas","sigma"],
+  futuristic: ["quant","astro","cyber","hyper","nano","void","xeno","orbit","ion","zenith","meta","axiom","photon","cypher"],
+  cute: ["puff","momo","kiki","bunny","lumi","pearl","sprout","bobo","coco","milo","dot","pop","fizzy","doodle"],
+  edgy: ["razor","void","vex","grim","fang","riptide","shard","blitz","skein","thorn","ember","wraith","hex","venom"]
+};
+
+const QUOTES = {
+  focus: [ {t:"Focus on progress, not perfection.", a:"Unknown"}, {t:"Small daily improvements lead to big results.", a:"Unknown"}, {t:"Concentrate on the next small step — that’s how mountains move.", a:"Unknown"} ],
+  confidence: [ {t:"Confidence grows when you show up consistently.", a:"Unknown"}, {t:"Don’t wait for perfect conditions — start where you are.", a:"Unknown"}, {t:"You are stronger than your doubts.", a:"Unknown"} ],
+  creativity: [ {t:"Creativity is intelligence having fun.", a:"Albert Einstein"}, {t:"Try something terrible — that’s often the start of something great.", a:"Unknown"}, {t:"Play opens doors to new ideas — be playful.", a:"Unknown"} ],
+  calm: [ {t:"Breathe, then act — thoughtful action beats panic.", a:"Unknown"}, {t:"A calm mind clears the fog and finds the path.", a:"Unknown"}, {t:"Simplicity is the ultimate sophistication.", a:"Leonardo da Vinci"} ]
+};
+
+// helpers
+function safeText(s){ return (s||'').toString().replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+function uid(){ return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,9); }
+function randInt(n){
+  // combine crypto with fallback for environments that don't fully support it
+  try{ const r = crypto.getRandomValues(new Uint32Array(1))[0]; return r % n; }catch(e){ return Math.floor(Math.random()*n); }
+}
+
+/* ---------- elements ---------- */
+const quoteText = document.getElementById('quoteText');
+const quoteAuthor = document.getElementById('quoteAuthor');
+const genQuoteBtn = document.getElementById('genQuote');
+const quoteCategory = document.getElementById('quoteCategory');
+const favQuoteBtn = document.getElementById('favQuote');
+const copyQuoteBtn = document.getElementById('copyQuote');
+const autoRotate = document.getElementById('autoRotate');
+const rotateInterval = document.getElementById('rotateInterval');
+const confettiToggle = document.getElementById('showConfetti');
+const confettiCanvas = document.getElementById('confettiCanvas');
+const enableSound = document.getElementById('enableSound');
+const notifyToggle = document.getElementById('notifyToggle');
+
+const genNamesBtn = document.getElementById('genNames');
+const nameResults = document.getElementById('nameResults');
+const nameStyleSelect = document.getElementById('nameStyle');
+const keywordsInput = document.getElementById('keywords');
+const nameType = document.getElementById('nameType');
+const nameCountInput = document.getElementById('nameCount');
+const favSelectionBtn = document.getElementById('favSelection');
+const copyAllNamesBtn = document.getElementById('copyAllNames');
+
+const favoritesListEl = document.getElementById('favoritesList');
+const statGenerated = document.getElementById('statGenerated');
+const statFavs = document.getElementById('statFavs');
+const statNames = document.getElementById('statNames');
+const btnTheme = document.getElementById('btnTheme');
+const exportAllBtn = document.getElementById('exportAll');
+const exportFavBtn = document.getElementById('exportFav');
+const clearFavBtn = document.getElementById('clearFav');
+const importFavBtn = document.getElementById('importFav');
+const searchFavInput = document.getElementById('searchFav');
+const exportNamesBtn = document.getElementById('exportNames');
+
+/* ---------- analytics & storage ---------- */
+let analytics = JSON.parse(localStorage.getItem('do_stats')||'{}');
+analytics.generated = analytics.generated||0; analytics.names = analytics.names||0; analytics.favs = analytics.favs||0;
+
+function loadFavorites(){ return JSON.parse(localStorage.getItem('do_favs')||'[]'); }
+function saveFavorites(arr){ localStorage.setItem('do_favs', JSON.stringify(arr)); renderFavorites(); }
+function addFavorite(type, text, meta){ const f = loadFavorites(); f.unshift({ id: uid(), type, text, meta, created: new Date().toISOString() }); saveFavorites(f); analytics.favs = (analytics.favs||0)+1; saveAnalytics(); }
+
+/* render favorites with search & actions (copy, share, edit, delete) */
+function renderFavorites(filter=''){
+  const list = loadFavorites();
+  const out = document.createDocumentFragment();
+  const filtered = filter ? list.filter(i => (i.text + ' ' + (i.meta||'')).toLowerCase().includes(filter.toLowerCase())) : list;
+  if(!filtered.length){ favoritesListEl.innerHTML = '<div class="mini" style="color:var(--muted)">No favorites yet — save quotes or names here.</div>'; updateStats(); return; }
+  favoritesListEl.innerHTML = '';
+  filtered.forEach(item=>{
+    const d = document.createElement('div'); d.className='fav-item'; d.dataset.id = item.id;
+    d.innerHTML = `
+      <div style="flex:1">
+        <div class="mini" style="opacity:0.8">${item.type.toUpperCase()} • <small style='color:var(--muted)'>${new Date(item.created).toLocaleString()}</small></div>
+        <div style="font-weight:700;margin-top:6px">${safeText(item.text)}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+        <button title="Copy" class="small" data-action="copy">Copy</button>
+        <button title="Edit" class="small" data-action="edit">Edit</button>
+        <button title="Remove" class="small" data-action="remove">Remove</button>
+      </div>`;
+    favoritesListEl.appendChild(d);
+  });
+  updateStats();
+}
+
+// favorites action delegation
+favoritesListEl.addEventListener('click', (e)=>{
+  const btn = e.target.closest('button'); if(!btn) return;
+  const itemEl = btn.closest('.fav-item'); if(!itemEl) return;
+  const id = itemEl.dataset.id; const action = btn.dataset.action;
+  const list = loadFavorites(); const idx = list.findIndex(x=>x.id===id); if(idx<0) return;
+  if(action==='copy'){ navigator.clipboard.writeText(list[idx].text); toast('Copied'); }
+  else if(action==='remove'){ if(confirm('Remove favorite?')){ list.splice(idx,1); saveFavorites(list); toast('Removed'); } }
+  else if(action==='edit'){
+    const newText = prompt('Edit favorite text', list[idx].text); if(newText!=null){ list[idx].text = newText.trim(); saveFavorites(list); toast('Updated'); }
+  }
+});
+
+/* ---------- Quote logic ---------- */
+function pickQuote(cat){ let pool = []; if(!cat || cat==='all'){ for(const k in QUOTES) pool = pool.concat(QUOTES[k]); } else pool = QUOTES[cat] ? QUOTES[cat].slice() : []; if(!pool.length) pool = [].concat(...Object.values(QUOTES)); return pool[randInt(pool.length)]; }
+
+function renderQuote(q){ quoteText.classList.remove('reveal'); quoteAuthor.classList.remove('reveal'); setTimeout(()=>{ quoteText.textContent = q.t; quoteAuthor.textContent = q.a ? '— ' + q.a : ''; quoteText.classList.add('reveal'); quoteAuthor.classList.add('reveal'); },30); analytics.generated = (analytics.generated||0)+1; saveAnalytics(); if(confettiToggle.checked) confetti.spawn(22); if(enableSound.checked) beep(620,0.08,'sine'); updateStats(); }
+
+genQuoteBtn.addEventListener('click', ()=> renderQuote(pickQuote(quoteCategory.value)) );
+
+favQuoteBtn.addEventListener('click', ()=>{ const text = quoteText.textContent.trim(); if(!text || text.includes('Generate')) return toast('Nothing to favorite yet.'); addFavorite('quote', text, quoteAuthor.textContent||''); toast('Saved to favorites'); });
+
+copyQuoteBtn.addEventListener('click', ()=>{ const text = quoteText.textContent.trim(); if(!text) return; navigator.clipboard.writeText(text + (quoteAuthor.textContent ? ' ' + quoteAuthor.textContent : '')); copyQuoteBtn.textContent = 'Copied ✓'; setTimeout(()=> copyQuoteBtn.textContent = 'Copy',900); if(enableSound.checked) beep(780,0.06,'triangle'); });
+
+/* auto-rotate */
+let rotateTimer = null;
+autoRotate.addEventListener('change', ()=> { if(autoRotate.checked) startAutoRotate(); else stopAutoRotate(); });
+function startAutoRotate(){ stopAutoRotate(); const t = Math.max(1500, parseInt(rotateInterval.value)||4000); rotateTimer = setInterval(()=> renderQuote(pickQuote(quoteCategory.value)), t); }
+function stopAutoRotate(){ if(rotateTimer){ clearInterval(rotateTimer); rotateTimer=null; } }
+
+/* notifications (simple hourly) */
+let notifyIntervalId = null;
+notifyToggle.addEventListener('change', async ()=>{
+  if(notifyToggle.checked){ if(!('Notification' in window)){ alert('Notifications not supported'); notifyToggle.checked=false; return; } const perm = await Notification.requestPermission(); if(perm!=='granted'){ alert('Permission not granted'); notifyToggle.checked=false; return; } scheduleHourlyNotification(); } else { clearScheduledNotifications(); }
+});
+function scheduleHourlyNotification(){ clearScheduledNotifications(); notifyIntervalId = setInterval(()=>{ const q = pickQuote('all'); try{ new Notification('DeepOcean Inspiration', { body: q.t }); }catch(e){} }, 1000*60*60); }
+function clearScheduledNotifications(){ if(notifyIntervalId) clearInterval(notifyIntervalId); notifyIntervalId=null; }
+
+/* ---------- Name generator (improved) ---------- */
+function buildNamePools(style, keywordsRaw){ const p=[]; const kw=(keywordsRaw||'').split(',').map(s=>s.trim()).filter(Boolean); const base = NAME_WORDS[style] ? NAME_WORDS[style].slice() : []; if(kw.length){ kw.forEach(k=>{ const cleaned = k.toLowerCase().replace(/[^a-z0-9]/gi,''); if(cleaned){ p.push(cleaned); p.push(cleaned.charAt(0).toUpperCase()+cleaned.slice(1)); p.push(cleaned + (randInt(99)+1)); } }); }
+  base.forEach(w=>p.push(w)); const joiners = ['lab','co','studio','hub','box','forge','works','zone','play','craft','net','io']; joiners.forEach(j=>p.push(j)); return Array.from(new Set(p)); }
+
+function capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+function leetspeak(s){ return s.replace(/a/gi,'4').replace(/e/gi,'3').replace(/i/gi,'1').replace(/o/gi,'0').replace(/s/gi,'5'); }
+function sanitizeName(s){ return s.replace(/[^\w\-\s\._&]/g,'').replace(/\s+/g,' ').trim(); }
+
+function generateNameOnce(pool, style, type){ const pick = ()=> pool[randInt(pool.length)]; let name=''; if(type==='brand' || type==='yt'){ if(Math.random()<0.5) name = pick(); else name = pick()+capitalize(pick()); if(Math.random()<0.12) name += (randInt(90)+10); } else if(type==='game'){ const a=pick(), b=pick(); const join = ['', '-', ' ', ' & '][randInt(4)]; name = capitalize(a) + join + capitalize(b); if(Math.random()<0.12) name += ' ' + (['Saga','Quest','Rift','Chronicles'][randInt(4)]); } else { name = pick().replace(/\s+/g,'') + (Math.random()<0.5 ? '_' + (randInt(999)+1) : ''); }
+  if(style==='futuristic'){ name = leetspeak(name); if(Math.random()<0.16) name = name + (randInt(900)+100); } else if(style==='edgy'){ if(Math.random()<0.16) name = name + '-' + ['X','V','Z'][randInt(3)]; } else if(style==='cute'){ if(Math.random()<0.22) name = name + (['_bot','_to','_pix'][randInt(3)]); }
+  name = name.replace(/([A-Za-z])\1{2,}/g,'$1$1'); return sanitizeName(name);
+}
+
+function generateNames(count, style, keywords, type){ const pool = buildNamePools(style, keywords); const results=[]; const seen=new Set(); let safety=0; while(results.length<count && safety < count*10){ const n = generateNameOnce(pool, style, type); safety++; if(!n || seen.has(n.toLowerCase())) continue; seen.add(n.toLowerCase()); results.push(n); }
+  analytics.names = (analytics.names||0)+results.length; saveAnalytics(); updateStats(); return results; }
+
+/* render names */
+function renderNameResults(arr){ nameResults.innerHTML=''; arr.forEach(n=>{ const c = document.createElement('div'); c.className='name-card'; c.innerHTML = `<div style="min-width:0;word-break:break-word">${safeText(n)}</div><div style="display:flex;gap:6px"><button class="small" data-action="copy">Copy</button><button class="small" data-action="fav">♡</button></div>`; nameResults.appendChild(c); }); }
+
+// delegate name clicks
+nameResults.addEventListener('click', (e)=>{ const btn = e.target.closest('button'); if(!btn) return; const action = btn.dataset.action; const card = btn.closest('.name-card'); if(!card) return; const txt = card.querySelector('div').innerText.trim(); if(action==='copy'){ navigator.clipboard.writeText(txt); toast('Copied'); } else if(action==='fav'){ addFavorite('name', txt, ''); toast('Saved'); renderFavorites(); } });
+
+/* copy all names */
+copyAllNamesBtn.addEventListener('click', ()=>{ const items = Array.from(nameResults.querySelectorAll('.name-card')).map(el=>el.querySelector('div').innerText.trim()); if(!items.length) return toast('No names to copy.'); navigator.clipboard.writeText(items.join('\n')); toast('Copied all names to clipboard.'); });
+
+/* favorite visible */
+favSelectionBtn.addEventListener('click', ()=>{ const items = Array.from(nameResults.querySelectorAll('.name-card')).map(el=>el.querySelector('div').innerText.trim()); if(!items.length) return toast('No names to favorite.'); const f = loadFavorites(); items.forEach(it=> f.unshift({ id: uid(), type:'name', text: it, meta:'', created:new Date().toISOString() })); saveFavorites(f); toast('Favorited visible names.'); });
+
+/* export names CSV */
+exportNamesBtn.addEventListener('click', ()=>{ const items = Array.from(nameResults.querySelectorAll('.name-card')).map(el=>el.querySelector('div').innerText.trim()); if(!items.length) return toast('No names to export.'); const csv = items.map(r=>`"${r.replace(/"/g,'""')}"`).join('\n'); downloadText('deepocean_names.csv', csv); });
+
+/* --------- export & utils ---------- */
+function downloadText(filename, text, type='text/plain'){ const blob = new Blob([text], {type}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
+
+exportFavBtn.addEventListener('click', ()=>{ const fav = loadFavorites(); if(!fav.length) return toast('No favorites to export.'); const txt = fav.map(f=>`${f.type.toUpperCase()} — ${f.text}`).join('\n\n'); downloadText('deepocean_favorites.txt', txt); });
+
+exportAllBtn.addEventListener('click', ()=>{ const fav = loadFavorites(); if(!fav.length) return toast('No favorites to export.'); const json = { favorites: fav, stats: analytics, exportedAt: new Date().toISOString() }; downloadText('deepocean_export.json', JSON.stringify(json,null,2),'application/json'); toast('Exported JSON'); });
+
+clearFavBtn.addEventListener('click', ()=>{ if(confirm('Clear saved favorites?')){ localStorage.removeItem('do_favs'); renderFavorites(); toast('Favorites cleared'); } });
+
+/* import favorites */
+importFavBtn.addEventListener('click', ()=>{ const input = document.createElement('input'); input.type='file'; input.accept='application/json'; input.onchange = async (e)=>{ const f = e.target.files[0]; if(!f) return; try{ const txt = await f.text(); const parsed = JSON.parse(txt); if(parsed.favorites && Array.isArray(parsed.favorites)){ saveFavorites(parsed.favorites.concat(loadFavorites())); toast('Imported favorites'); } else{ toast('Invalid file format'); } }catch(err){ toast('Import failed'); } }; input.click(); });
+
+/* theme toggle */
+btnTheme.addEventListener('click', ()=>{ document.body.classList.toggle('light'); localStorage.setItem('do_theme', document.body.classList.contains('light') ? 'light' : 'dark'); btnTheme.setAttribute('aria-pressed', document.body.classList.contains('light')); updateThemeButton(); });
+function updateThemeButton(){ btnTheme.textContent = document.body.classList.contains('light') ? 'Dark theme' : 'Light theme'; }
+if(localStorage.getItem('do_theme') === 'light') document.body.classList.add('light'); updateThemeButton();
+
+/* search favorites */
+let searchTimer=null; searchFavInput.addEventListener('input', ()=>{ clearTimeout(searchTimer); searchTimer=setTimeout(()=> renderFavorites(searchFavInput.value.trim()), 220); });
+
+/* small UI helpers & analytics */
+function toast(msg){ const d=document.createElement('div'); d.textContent=msg; d.style.position='fixed'; d.style.left='50%'; d.style.transform='translateX(-50%)'; d.style.bottom='28px'; d.style.background='rgba(0,0,0,0.8)'; d.style.color='#fff'; d.style.padding='8px 14px'; d.style.borderRadius='10px'; d.style.zIndex=9999; d.style.fontFamily='Poppins, system-ui, Arial'; d.style.opacity='0'; d.style.transition='opacity 0.25s'; document.body.appendChild(d); requestAnimationFrame(()=> d.style.opacity='1'); setTimeout(()=>{ d.style.opacity='0'; setTimeout(()=> d.remove(),250); }, 1200); }
+
+function updateStats(){ statGenerated.textContent = analytics.generated || 0; statFavs.textContent = (loadFavorites().length) || 0; statNames.textContent = analytics.names || 0; }
+function saveAnalytics(){ localStorage.setItem('do_stats', JSON.stringify(analytics)); updateStats(); }
+
+// quick startup
+renderFavorites(); updateStats(); renderQuote(pickQuote('focus'));
+
+/* keyboard shortcuts */
+keywordsInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ genNamesBtn.click(); e.preventDefault(); } });
+
+/* save favorites & stats before unload */
+window.addEventListener('beforeunload', ()=>{ try{ localStorage.setItem('do_favs', JSON.stringify(loadFavorites())); localStorage.setItem('do_stats', JSON.stringify(analytics)); }catch(e){} });
+
+/* sound */
+const audioCtx = (typeof AudioContext !== 'undefined') ? new AudioContext() : null;
+function beep(freq=440, duration=0.10, type='sine'){ if(!audioCtx) return; const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type = type; o.frequency.value = freq; o.connect(g); g.connect(audioCtx.destination); g.gain.value = 0.0001; const now = audioCtx.currentTime; g.gain.exponentialRampToValueAtTime(0.12, now + 0.02); o.start(now); g.gain.exponentialRampToValueAtTime(0.00001, now + duration); o.stop(now + duration + 0.02); }
+
+/* small confetti (kept efficient) */
+const confetti = (function(){ const C = confettiCanvas; const ctx = C.getContext('2d'); let parts=[], running=false; function resize(){ C.width = C.offsetWidth; C.height = C.offsetHeight; } function spawn(n=30){ for(let i=0;i<n;i++){ parts.push({ x: Math.random()*C.width, y: -10 - Math.random()*60, vx:(Math.random()-0.5)*3, vy:1+Math.random()*3, r:2+Math.random()*6, col:['#7ae7ff','#38d6ff','#8ef5d4','#ffd58f'][randInt(4)], rot:Math.random()*360, life:60+randInt(90) }); } if(!running) run(); }
+  function run(){ running=true; resize(); (function loop(){ ctx.clearRect(0,0,C.width,C.height); for(let i=parts.length-1;i>=0;i--){ const p=parts[i]; p.x+=p.vx; p.y+=p.vy; p.vy += 0.06; p.life--; ctx.fillStyle=p.col; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180); ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r); ctx.restore(); if(p.life<0 || p.y>C.height+50) parts.splice(i,1); } if(parts.length) requestAnimationFrame(loop); else running=false; })(); }
+  return { spawn, resize }; })();
+window.addEventListener('resize', ()=>{ const pc=document.getElementById('particleLayer'); pc.width = window.innerWidth; pc.height = window.innerHeight; confetti.resize(); });
+
+/* background particles (lightweight) */
+(function(){ const canvas = document.getElementById('particleLayer'); const ctx = canvas.getContext('2d'); let particles=[]; function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; } function spawn(count=70){ particles=[]; for(let i=0;i<count;i++){ particles.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r:0.6+Math.random()*2.2, vx:(Math.random()-0.5)*0.3, vy:(Math.random()*0.6)+0.05, alpha:0.06+Math.random()*0.12 }); } }
+  function update(){ ctx.clearRect(0,0,canvas.width,canvas.height); for(const p of particles){ p.x+=p.vx; p.y+=p.vy; if(p.y > canvas.height + 8){ p.y = -8; p.x = Math.random()*canvas.width; } ctx.fillStyle = `rgba(120,210,255,${p.alpha})`; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); } requestAnimationFrame(update); }
+  resize(); spawn(80); update(); window.addEventListener('resize', ()=>{ resize(); spawn(80); }); })();
+
+/* small helper to not repeat function name collisions when docs are imported */
+function copyTextToClipboard(t){ navigator.clipboard.writeText(t); }
+
+</script>
+</body>
+</html>
