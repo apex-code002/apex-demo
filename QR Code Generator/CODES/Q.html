@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Custom QR Code Generator</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        /* Import a modern font */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        /* --- Global & Base Styles --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            background: #e0f7fa; /* Light Blue Background */
+        }
+        
+        /* --- WRAPPER: Modern 3D Card Look (Advanced CSS) --- */
+        .wrapper { 
+            max-width: 450px; 
+            width: 90%; 
+            padding: 30px; 
+            background: #ffffff; 
+            border-radius: 20px; 
+            /* Advanced Shadow: Inner glow + deep lift */
+            box-shadow: 
+                0 4px 6px rgba(0, 0, 0, 0.05) inset, 
+                0 20px 40px rgba(0, 0, 0, 0.15); 
+            transition: all 0.3s ease; 
+        }
+        
+        /* --- Typography and Layout --- */
+        header h1 { font-size: 24px; font-weight: 700; color: #333; margin-bottom: 5px; }
+        header p { font-size: 16px; color: #777; margin-bottom: 25px; }
+        .form { display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px; }
+        
+        /* Layout for Type and Colors (Flexbox) */
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        /* Default to 50% width for type and color pickers */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 50%;
+        }
+        .color-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px; 
+            width: 50%;
+        }
+        .color-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .input-group label, .color-group label {
+            font-size: 14px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        /* --- Input and Textarea Styling --- */
+        #qr-input, #qr-type, #wifi-options input, #wifi-options select, 
+        #email-options input, #email-options textarea, #sms-options input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-sizing: border-box;
+        }
+        
+        #qr-input:focus, #qr-type:focus, #wifi-options input:focus, #email-options input:focus, #sms-options input:focus { 
+            border-color: #00bcd4; 
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.2);
+        }
+        #email-options textarea { resize: vertical; padding: 10px 15px; }
+
+        /* Color Picker Styling */
+        #fg-color-picker, #bg-color-picker {
+            border: none;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            background: none;
+            cursor: pointer;
+        }
+        #fg-color-picker::-webkit-color-swatch-wrapper, #bg-color-picker::-webkit-color-swatch-wrapper { padding: 0; }
+        #fg-color-picker::-webkit-color-swatch, #bg-color-picker::-webkit-color-swatch { border: 1px solid #ccc; border-radius: 6px; }
+
+        /* Multi-Option Layouts */
+        #wifi-options, #email-options, #sms-options { display: none; gap: 15px; flex-direction: column; padding-top: 5px; border-top: 1px solid #eee; }
+        .wifi-row { display: flex; gap: 15px; }
+        .wifi-row .input-group { width: 100%; }
+        
+        /* --- Button Styling: Gradient & Lift Effect (Advanced CSS) --- */
+        #generate-btn { 
+            background: linear-gradient(90deg, #00bcd4, #0096a8); 
+            color: #fff; 
+            border: none; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 18px; 
+            font-weight: 700; 
+            padding: 14px 25px; 
+            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.4); 
+            transition: all 0.3s ease; 
+            text-transform: uppercase; 
+        }
+        #generate-btn:hover { 
+            background: linear-gradient(90deg, #0096a8, #00bcd4);
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 20px rgba(0, 188, 212, 0.5);
+        }
+
+        /* --- QR Output Area --- */
+        .qr-code-area { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            padding: 20px; 
+            opacity: 0; 
+            max-height: 0; 
+            overflow: hidden; 
+            transition: opacity 0.4s ease, max-height 0.4s ease, padding 0.4s ease; 
+        }
+        .wrapper.active .qr-code-area { opacity: 1; max-height: 400px; margin-top: 15px; }
+        #qrcode-box { margin-bottom: 15px; }
+        
+        #download-btn { 
+            padding: 12px 20px; 
+            background: #00bcd4; 
+            color: #fff; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: 600; 
+            transition: background 0.3s ease; 
+        }
+        #download-btn:hover { background: #0097a7; }
+        
+        /* Shake Animation for Error */
+        .wrapper.error { animation: shake 0.6s; }
+        @keyframes shake {
+            0% { transform: translateX(0); } 20% { transform: translateX(-5px); } 40% { transform: translateX(5px); }
+            60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } 100% { transform: translateX(0); }
+        }
+
+        /* --- Responsive Design (for smaller screens) --- */
+        @media (max-width: 480px) {
+            .controls-row { flex-direction: column; gap: 10px; }
+            .input-group, .color-options { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+            <h1>Advanced QR Code Generator</h1>
+            <p>Generate codes for URLs, Wi-Fi, Email, SMS, and customize colors.</p>
+        </header>
+
+        <div class="form">
+            
+            <div class="controls-row">
+                <div class="input-group">
+                    <label for="qr-type">QR Code Type:</label>
+                    <select id="qr-type">
+                        <option value="url" selected>Website URL</option>
+                        <option value="text">Plain Text</option>
+                        <option value="wifi">Wi-Fi Access</option>
+                        <option value="email">Email Message</option> <option value="sms">SMS Message</option>    </select>
+                </div>
+
+                <div class="color-options">
+                    <div class="color-group">
+                        <label for="fg-color-picker">Foreground:</label>
+                        <input type="color" id="fg-color-picker" value="#000000">
+                    </div>
+                    <div class="color-group">
+                        <label for="bg-color-picker">Background:</label>
+                        <input type="color" id="bg-color-picker" value="#ffffff">
+                    </div>
+                </div>
+            </div>
+
+            <input type="text" id="qr-input" placeholder="Enter your website URL (e.g., https://example.com)">
+            
+            <div id="wifi-options">
+                <div class="input-group">
+                    <label for="wifi-ssid">SSID (Network Name):</label>
+                    <input type="text" id="wifi-ssid" placeholder="e.g., MyHomeNetwork">
+                </div>
+                <div class="wifi-row">
+                    <div class="input-group">
+                        <label for="wifi-encryption">Encryption:</label>
+                        <select id="wifi-encryption">
+                            <option value="WPA">WPA/WPA2</option>
+                            <option value="WEP">WEP</option>
+                            <option value="nopass">None</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="wifi-password">Password:</label>
+                        <input type="text" id="wifi-password" placeholder="e.g., mysecretpassword">
+                    </div>
+                </div>
+            </div>
+            
+            <div id="email-options">
+                <div class="input-group">
+                    <label for="email-to">Recipient Email:</label>
+                    <input type="email" id="email-to" placeholder="e.g., info@example.com">
+                </div>
+                <div class="input-group">
+                    <label for="email-subject">Subject:</label>
+                    <input type="text" id="email-subject" placeholder="e.g., Inquiry from Website">
+                </div>
+                <div class="input-group">
+                    <label for="email-body">Body:</label>
+                    <textarea id="email-body" rows="3" placeholder="Enter your message body..."></textarea>
+                </div>
+            </div>
+
+            <div id="sms-options">
+                <div class="wifi-row">
+                    <div class="input-group">
+                        <label for="sms-number">Phone Number:</label>
+                        <input type="tel" id="sms-number" placeholder="e.g., +15551234567">
+                    </div>
+                    <div class="input-group">
+                        <label for="sms-message">Message:</label>
+                        <input type="text" id="sms-message" placeholder="e.g., Can you call me back?">
+                    </div>
+                </div>
+            </div>
+
+            <button id="generate-btn">Generate QR Code</button>
+        </div>
+
+        <div class="qr-code-area">
+            <div id="qrcode-box"></div>
+            <button id="download-btn">Download QR Code (PNG)</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Element Selection ---
+        const qrType = document.getElementById('qr-type');
+        const qrInput = document.getElementById('qr-input');
+        
+        // Wi-Fi
+        const wifiOptionsDiv = document.getElementById('wifi-options');
+        const wifiSSID = document.getElementById('wifi-ssid');
+        const wifiEncryption = document.getElementById('wifi-encryption');
+        const wifiPassword = document.getElementById('wifi-password');
+        
+        // Email (NEW)
+        const emailOptionsDiv = document.getElementById('email-options');
+        const emailTo = document.getElementById('email-to');
+        const emailSubject = document.getElementById('email-subject');
+        const emailBody = document.getElementById('email-body');
+
+        // SMS (NEW)
+        const smsOptionsDiv = document.getElementById('sms-options');
+        const smsNumber = document.getElementById('sms-number');
+        const smsMessage = document.getElementById('sms-message');
+        
+        // Output and Control
+        const generateBtn = document.getElementById('generate-btn');
+        const qrcodeBox = document.getElementById('qrcode-box');
+        const downloadBtn = document.getElementById('download-btn');
+        const fgColorPicker = document.getElementById('fg-color-picker');
+        const bgColorPicker = document.getElementById('bg-color-picker');
+        const wrapper = document.querySelector('.wrapper');
+
+        let qrcode = null; 
+
+        // --- Payload Generation Functions ---
+        
+        // Wi-Fi Payload
+        function escapeWifiData(data) {
+            if (!data) return '';
+            return data.replace(/([\\;,":])/g, '\\$1');
+        }
+
+        function getWifiPayload() {
+            const ssid = escapeWifiData(wifiSSID.value.trim());
+            const encryption = wifiEncryption.value;
+            let password = '';
+            
+            if (encryption !== 'nopass') {
+                password = escapeWifiData(wifiPassword.value.trim());
+            }
+
+            if (!ssid) { alert("Please enter a Wi-Fi Network Name (SSID)."); return null; }
+            if (encryption !== 'nopass' && !password) { alert("Please enter the Wi-Fi password."); return null; }
+            
+            return `WIFI:T:${encryption};S:${ssid};P:${password};;`;
+        }
+
+        // Email Payload (NEW)
+        function getEmailPayload() {
+            const to = emailTo.value.trim();
+            const subject = encodeURIComponent(emailSubject.value.trim());
+            const body = encodeURIComponent(emailBody.value.trim());
+
+            if (!to) { alert("Please enter a recipient email address."); return null; }
+
+            let payload = `mailto:${to}`;
+            if (subject || body) {
+                payload += '?';
+                if (subject) {
+                    payload += `subject=${subject}`;
+                }
+                if (body) {
+                    payload += subject ? `&body=${body}` : `body=${body}`;
+                }
+            }
+            return payload;
+        }
+
+        // SMS Payload (NEW)
+        function getSMSPayload() {
+            const number = smsNumber.value.trim();
+            const message = smsMessage.value.trim(); 
+
+            if (!number) { alert("Please enter a phone number."); return null; }
+            
+            // Format: SMSTO:<phone>:<message>
+            return `SMSTO:${number}:${message}`;
+        }
+        
+        // --- UI Management ---
+
+        function updateTypeView() {
+            const selectedType = qrType.value;
+            
+            // Manage visibility for all main input fields
+            qrInput.style.display = (selectedType === 'url' || selectedType === 'text') ? 'block' : 'none';
+            wifiOptionsDiv.style.display = (selectedType === 'wifi') ? 'flex' : 'none';
+            emailOptionsDiv.style.display = (selectedType === 'email') ? 'flex' : 'none';
+            smsOptionsDiv.style.display = (selectedType === 'sms') ? 'flex' : 'none';
+            
+            // Update placeholder text for single input field
+            let placeholderText = "";
+            switch(selectedType) {
+                case "url": placeholderText = "Enter your website URL (e.g., https://example.com)"; break;
+                case "text": placeholderText = "Enter any plain text or message"; break;
+                case "wifi": 
+                case "email": 
+                case "sms": placeholderText = ""; break;
+            }
+            qrInput.placeholder = placeholderText;
+            
+            // Reset and hide QR area
+            qrcodeBox.innerHTML = '';
+            wrapper.classList.remove('active');
+        }
+
+        // Initialize view
+        updateTypeView(); 
+
+        // --- Core Generation Logic ---
+
+        function generateQRCode() {
+            const selectedType = qrType.value;
+            let qrValue = '';
+
+            switch (selectedType) {
+                case 'wifi':
+                    qrValue = getWifiPayload();
+                    break;
+                case 'email':
+                    qrValue = getEmailPayload();
+                    break;
+                case 'sms':
+                    qrValue = getSMSPayload();
+                    break;
+                default: // url or text
+                    qrValue = qrInput.value.trim();
+                    break;
+            }
+
+            const qrFGColor = fgColorPicker.value;
+            const qrBGColor = bgColorPicker.value;
+
+            if (!qrValue) {
+                if (selectedType === 'url' || selectedType === 'text') {
+                    wrapper.classList.add('error');
+                    setTimeout(() => wrapper.classList.remove('error'), 600);
+                }
+                return;
+            }
+
+            // Clear previous code and hide
+            qrcodeBox.innerHTML = '';
+            wrapper.classList.remove('active');
+
+            // Generate new QR Code
+            qrcode = new QRCode(qrcodeBox, {
+                text: qrValue,
+                width: 250,
+                height: 250,
+                colorDark: qrFGColor, 
+                colorLight: qrBGColor, 
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            // Show QR code after a small delay
+            setTimeout(() => { wrapper.classList.add('active'); }, 100);
+        }
+
+        // --- Download Logic ---
+
+        function downloadQRCode() {
+            // The qrcode.js library generates a canvas element.
+            const canvas = qrcodeBox.querySelector('canvas');
+            
+            if (canvas) {
+                // Get the data URL from the canvas
+                const imageURL = canvas.toDataURL('image/png');
+                const tempLink = document.createElement('a');
+                tempLink.href = imageURL;
+                
+                // Create a dynamic filename
+                const selectedType = qrType.value; 
+                const filename = `qrcode_${selectedType}_${Date.now()}.png`;
+                tempLink.download = filename;
+
+                // Trigger download
+                document.body.appendChild(tempLink);
+                tempLink.click();
+                document.body.removeChild(tempLink);
+            } else {
+                alert("Please generate a QR code first!");
+            }
+        }
+
+        // --- Event Listeners ---
+        qrType.addEventListener('change', updateTypeView);
+        generateBtn.addEventListener('click', generateQRCode);
+        downloadBtn.addEventListener('click', downloadQRCode);
+        
+        // Auto-Regenerate on color change if code is already showing
+        [fgColorPicker, bgColorPicker].forEach(el => {
+            el.addEventListener('change', () => {
+                if (wrapper.classList.contains('active')) {
+                    generateQRCode();
+                }
+            });
+        });
+
+        // Generate on Enter key for the main input
+        qrInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { generateQRCode(); }
+        });
+        
+        // Auto-Regenerate for Wi-Fi, Email, SMS changes
+        [wifiSSID, wifiEncryption, wifiPassword, emailTo, emailSubject, emailBody, smsNumber, smsMessage].forEach(el => {
+            el.addEventListener('change', () => {
+                if (wrapper.classList.contains('active')) { 
+                    generateQRCode(); 
+                }
+            });
+        });
+    </script>
+</body>
+</html>
