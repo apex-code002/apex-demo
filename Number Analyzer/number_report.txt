@@ -1,0 +1,57 @@
+=== Number Analyzer Pro Report ===
+
+Number: 1
+  Even: False
+  Odd: True
+  Prime: False
+  Palindrome: True
+  Perfect Square: True
+  Armstrong: True
+  Perfect Number: False
+
+Number: 3
+  Even: False
+  Odd: True
+  Prime: True
+  Palindrome: True
+  Perfect Square: False
+  Armstrong: True
+  Perfect Number: False
+
+Number: 5
+  Even: False
+  Odd: True
+  Prime: True
+  Palindrome: True
+  Perfect Square: False
+  Armstrong: True
+  Perfect Number: False
+
+Number: 7
+  Even: False
+  Odd: True
+  Prime: True
+  Palindrome: True
+  Perfect Square: False
+  Armstrong: True
+  Perfect Number: False
+
+Number: 8
+  Even: True
+  Odd: False
+  Prime: False
+  Palindrome: True
+  Perfect Square: False
+  Armstrong: True
+  Perfect Number: False
+
+Number: 6
+  Even: True
+  Odd: False
+  Prime: False
+  Palindrome: True
+  Perfect Square: False
+  Armstrong: True
+  Perfect Number: True
+
+=== End of Report ===
