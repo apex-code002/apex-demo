@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌊 DeepOcean Labs — SkyMatrix Console</title>
+
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root {
+  --primary: #00bcd4;
+  --bg-light: #f7f9fc;
+  --text-light: #111;
+  --bg-dark: #0b0f19;
+  --text-dark: #fff;
+  --card-light: #fff;
+  --card-dark: #131a27;
+  --accent: #00e0ff;
+}
+
+/* === THEME CONTROL === */
+body.light {
+  background: var(--bg-light);
+  color: var(--text-light);
+}
+
+body.dark {
+  background: var(--bg-dark);
+  color: var(--text-dark);
+}
+
+/* === GLOBAL === */
+* {
+  box-sizing: border-box;
+  transition: background 0.4s, color 0.4s, transform 0.3s;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* === HEADER === */
+header {
+  width: 100%;
+  padding: 20px;
+  text-align: center;
+  font-size: 1.5em;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+/* === SEARCH BAR === */
+.search {
+  margin: 20px;
+  display: flex;
+  gap: 10px;
+}
+.search input {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  width: 250px;
+  outline: none;
+}
+.search button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.search button:hover {
+  transform: scale(1.05);
+}
+
+/* === THEME TOGGLE === */
+.theme-toggle {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  cursor: pointer;
+  font-size: 18px;
+  box-shadow: 0 0 10px rgba(0,255,255,0.5);
+}
+
+/* === WEATHER CARD === */
+.card {
+  background: var(--card-light);
+  color: var(--text-light);
+  border-radius: 15px;
+  padding: 25px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  width: 300px;
+}
+body.dark .card {
+  background: var(--card-dark);
+  color: var(--text-dark);
+}
+
+/* === FOOTER === */
+footer {
+  margin-top: auto;
+  padding: 15px;
+  font-size: 0.9em;
+  text-align: center;
+  opacity: 0.8;
+}
+</style>
+</head>
+
+<body class="dark">
+<header>🌊 DeepOcean Labs — WeatherSphere Pro Edition</header>
+
+<!-- THEME TOGGLE -->
+<button class="theme-toggle" id="themeBtn">☀️</button>
+
+<!-- SEARCH BAR -->
+<div class="search">
+  <input type="text" id="cityInput" placeholder="Enter city (e.g. Nanded)">
+  <button onclick="getWeather()">Search</button>
+</div>
+
+<!-- WEATHER DISPLAY -->
+<div class="card" id="weatherCard">
+  <h2>City: <span id="cityName">---</span></h2>
+  <p><b>Temperature:</b> <span id="temp">--°C</span></p>
+  <p><b>Condition:</b> <span id="condition">--</span></p>
+  <p><b>Humidity:</b> <span id="humidity">--%</span></p>
+  <p><b>Wind Speed:</b> <span id="wind">-- km/h</span></p>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  Built with 💠 by <b>DeepOcean Labs</b> — Precision Weather Intelligence v2.0
+</footer>
+
+<script>
+// === THEME SYSTEM ===
+const themeBtn = document.getElementById('themeBtn');
+themeBtn.addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+  document.body.classList.toggle('light');
+  const isDark = document.body.classList.contains('dark');
+  themeBtn.textContent = isDark ? '☀️' : '🌙';
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+});
+
+// Load saved theme
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) {
+  document.body.classList.remove('light', 'dark');
+  document.body.classList.add(savedTheme);
+  themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+}
+
+// === WEATHER FETCH ===
+async function getWeather() {
+  const city = document.getElementById('cityInput').value.trim();
+  if (!city) return alert('Enter a city name!');
+  
+  const apiURL = `https://api.open-meteo.com/v1/forecast?latitude=19.15&longitude=77.32&current_weather=true`;
+
+  try {
+    const res = await fetch(apiURL);
+    const data = await res.json();
+
+    const weather = data.current_weather;
+    document.getElementById('cityName').textContent = city;
+    document.getElementById('temp').textContent = `${weather.temperature}°C`;
+    document.getElementById('condition').textContent = weather.weathercode === 0 ? 'Clear' : 'Cloudy';
+    document.getElementById('humidity').textContent = Math.floor(Math.random() * 40 + 40); // placeholder
+    document.getElementById('wind').textContent = `${weather.windspeed} km/h`;
+
+  } catch (err) {
+    alert('Error fetching weather data.');
+  }
+}
+</script>
+</body>
+</html>
