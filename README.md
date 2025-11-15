@@ -1,3 +1,3 @@
 # apex-demo
 This Is  My First Repository 
-Author: AKASH JOGDAND
+Author: Akash Jogdand
